@@ -55,6 +55,63 @@ def create_app(test_config=None):
             print(sys.exc_info())
             abort(405)
 
+    @app.route('/movies/<int:movie_id>', methods=['PATCH'])
+    def update_movie(movie_id):
+        body = request.get_json(force=True)
+
+        title = body.get('title', None)
+        release_date = body.get('release_date', None)
+
+        try:
+            movie = Movie.query.filter(
+                Movie.id == movie_id).one_or_none()
+
+            if movie:
+                movie.title = title
+                movie.release_date = release_date
+                movie.update()
+            else:
+                return jsonify({
+                    "success": False,
+                    'error': 'Movie not found'
+                }), 404
+
+            return jsonify({
+                'success': True,
+                'actors': [movie.format()]
+            }), 200
+
+        except Exception:
+            return jsonify({
+                "success": False,
+                'error': 'Error while updating movie'
+            }), 500
+
+    @app.route('/movies/<int:movie_id>', methods=['DELETE'])
+    def delete_movie(movie_id):
+        try:
+            movie = Movie.query.filter(
+                Movie.id == movie_id).one_or_none()
+
+            if movie:
+                movie.delete()
+            else:
+                return jsonify({
+                    "success": False,
+                    'error': 'Movie not found'
+                }), 404
+
+            return jsonify({
+                'success': True,
+                'delete': movie_id
+            }), 200
+
+        except Exception:
+            return jsonify({
+                "success": False,
+                'error': 'Error while deleting the movie'
+            }), 500
+
     @app.route('/actors', methods=['GET'])
     def get_actors():
         try:
