@@ -22,7 +22,7 @@ def create_app(test_config=None):
     @app.route('/actors', methods=['GET'])
     def get_actors():
         try:
-            actors = Actor.query.all()
+            actors = [actor.format() for actor in Actor.query.all()]
             return jsonify({
                 'success': True,
                 'actors': actors,
@@ -34,7 +34,7 @@ def create_app(test_config=None):
 
     @app.route('/actors', methods=['POST'])
     def create_actor():
-        body = request.get_json(force = True)
+        body = request.get_json(force=True)
 
         name = body.get('name', None)
         age = body.get('age', None)
@@ -55,6 +55,65 @@ def create_app(test_config=None):
         except:
             print(sys.exc_info())
             abort(405)
+
+    @app.route('/actors/<int:actor_id>', methods=['PATCH'])
+    def update_actor(actor_id):
+        body = request.get_json(force=True)
+
+        name = body.get('name', None)
+        age = body.get('age', None)
+        gender = body.get('gender', None)
+
+        try:
+            actor = Actor.query.filter(
+                Actor.id == actor_id).one_or_none()
+
+            if actor:
+                actor.name = name
+                actor.age = age
+                actor.gender = gender
+                actor.update()
+            else:
+                return jsonify({
+                    "success": False,
+                    'error': 'Actor not found'
+                }), 404
+
+            return jsonify({
+                'success': True,
+                'actors': [actor.format()]
+            }), 200
+
+        except Exception:
+            return jsonify({
+                "success": False,
+                'error': 'Error while updating actor'
+            }), 500
+
+    @app.route('/actors/<int:actor_id>', methods=['DELETE'])
+    def delete_actor(actor_id):
+        try:
+            actor = Actor.query.filter(
+                Actor.id == actor_id).one_or_none()
+
+            if actor:
+                actor.delete()
+            else:
+                return jsonify({
+                    "success": False,
+                    'error': 'Actor not found'
+                }), 404
+
+            return jsonify({
+                'success': True,
+                'delete': actor_id
+            }), 200
+
+        except Exception:
+            return jsonify({
+                "success": False,
+                'error': 'Error while deleting the actor'
+            }), 500
 
     @app.route('/coolkids')
     def be_cool():
