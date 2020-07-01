@@ -64,3 +64,7 @@ class Actor(db.Model):
             'age': self.age,
             'gender': self.gender
         }
+    
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
