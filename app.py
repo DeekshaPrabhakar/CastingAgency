@@ -19,6 +19,42 @@ def create_app(test_config=None):
             greeting = greeting + "!!!!!"
         return greeting
 
+    @app.route('/movies', methods=['GET'])
+    def get_movies():
+        try:
+            movies = [movie.format() for movie in Movie.query.all()]
+            return jsonify({
+                'success': True,
+                'movies': movies,
+                'total_movies': len(movies)
+            })
+        except:
+            print(sys.exc_info())
+            abort(404)
+
+    @app.route('/movies', methods=['POST'])
+    def create_movie():
+        body = request.get_json(force=True)
+
+        title = body.get('title', None)
+        release_date = body.get('release_date', None)
+
+        try:
+            movie = Movie(title=title, release_date=release_date)
+            movie.insert()
+            movies = [movie.format() for movie in Movie.query.all()]
+
+            return jsonify({
+                'success': True,
+                'created': movie.id,
+                'movies': movies,
+                'total_movies': len(movies)
+            })
+
+        except:
+            print(sys.exc_info())
+            abort(405)
+
     @app.route('/actors', methods=['GET'])
     def get_actors():
         try:
