@@ -149,6 +149,9 @@ def create_app(test_config=None):
         age = body.get('age', None)
         gender = body.get('gender', None)
 
+        if name is None or age is None or gender is None:
+            abort(400)
+
         try:
             actor = Actor(name=name, age=age, gender=gender)
             actor.insert()
@@ -231,6 +234,14 @@ def create_app(test_config=None):
         response = jsonify(exception.error)
         response.status_code = exception.status_code
         return response
+    
+    @app.errorhandler(400)
+    def not_allowed(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "Bad request"
+        }), 400
 
     @app.route('/coolkids')
     def be_cool():

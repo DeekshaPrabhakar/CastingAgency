@@ -25,6 +25,10 @@ class CastingAgencyTestCase(unittest.TestCase):
             'gender': 'Male'
         }
 
+        self.invalid_actor = {
+            "title": "Tom Hanks"
+        }
+
         self.new_movie = {
             'title': 'The Da Vinci Code',
             'release_date': 'May 19, 2006'
@@ -86,6 +90,37 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['code'], 'authorization_header_missing')
         self.assertEqual(data['description'],
                          'Authorization header is expected.')
+
+    def test_create_actor(self):
+        res = self.client().post('/actors',
+                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.new_actor)
+        data = json.loads(res.data)
+
+        actors = [actor.format() for actor in Actor.query.all()]
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['actors'], actors)
+        self.assertEqual(data['total_actors'], len(actors))
+
+    def test_actor_creation_not_allowed(self):
+        res = self.client().post('/actors',
+                                 headers={'Authorization': "Bearer {}".format(self.assistantToken)}, json=self.new_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['code'], 'invalid_access_request')
+        self.assertEqual(data['description'],
+                         'You dont have permissions to access this resource')
+    
+    def test_invalid_actor_creation(self):
+        res = self.client().post('/actors',
+                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.invalid_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['error'], 400)
+        self.assertEqual(data['message'],
+                         'Bad request')
 
 
 # Make the tests conveniently executable
