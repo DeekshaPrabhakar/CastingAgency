@@ -21,8 +21,8 @@ class CastingAgencyTestCase(unittest.TestCase):
         setup_db(self.app, self.database_path)
 
         self.new_actor = {
-            'name': 'Tom Hankss',
-            'age': 63,
+            'name': 'Tom Hanks',
+            'age': 61,
             'gender': 'Male'
         }
 
@@ -68,7 +68,13 @@ class CastingAgencyTestCase(unittest.TestCase):
             self.db.create_all()
 
     def tearDown(self):
-        """Executed after reach test"""
+        """Executed after each test"""
+        movies = Movie.query.filter(Movie.title == 'The Da Vinci Code').all()
+        for movie in movies:
+            movie.delete()
+        actors = Actor.query.filter(Actor.name == 'Tom Hanks').all()
+        for actor in actors:
+            actor.delete()
         pass
 
     def test_get_actors(self):
@@ -188,7 +194,14 @@ class CastingAgencyTestCase(unittest.TestCase):
                          'Bad request')
 
     def test_update_actor(self):
-        res = self.client().patch('/actors/1',
+        actor = Actor(
+            self.update_actor_valid.get('name'),
+            self.update_actor_valid.get('age'),
+            self.update_actor_valid.get('gender')
+        )
+        actor.insert()
+        actor_id = actor.id
+        res = self.client().patch('/actors/' + str(actor_id),
                                   headers=self.directorHeader,
                                   json=self.update_actor_valid
                                   )
@@ -224,7 +237,11 @@ class CastingAgencyTestCase(unittest.TestCase):
                          'Bad request')
 
     def test_update_movie(self):
-        res = self.client().patch('/movies/1',
+        movie = Movie(self.update_movie_valid.get('title'),
+                      self.update_movie_valid.get('release_date'))
+        movie.insert()
+        movie_id = movie.id
+        res = self.client().patch('/movies/' + str(movie_id),
                                   headers=self.producerHeader,
                                   json=self.update_movie_valid
                                   )
@@ -258,6 +275,34 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['error'], 400)
         self.assertEqual(data['message'],
                          'Bad request')
+
+    def test_delete_movie(self):
+        movie = Movie(self.update_movie_valid.get('title'),
+                      self.update_movie_valid.get('release_date'))
+        movie.insert()
+        movie_id = movie.id
+        res = self.client().delete('/movies/' + str(movie_id),
+                                   headers=self.producerHeader
+                                   )
+        data = json.loads(res.data)
+
+        movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], movie_id)
+        self.assertEqual(movie, None)
+
+    def test_delete_movie_not_exist(self):
+        res = self.client().delete('/movies/1000',
+                                   headers=self.producerHeader
+                                   )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['error'], 404)
+        self.assertEqual(data['message'],
+                         'Resource not found')
 
 
 # Make the tests conveniently executable

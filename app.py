@@ -90,10 +90,7 @@ def create_app(test_config=None):
                 movie.release_date = release_date
                 movie.update()
             else:
-                return jsonify({
-                    "success": False,
-                    'error': 'Movie not found'
-                }), 404
+                abort(404)
 
             return jsonify({
                 'success': True,
@@ -116,21 +113,15 @@ def create_app(test_config=None):
             if movie:
                 movie.delete()
             else:
-                return jsonify({
-                    "success": False,
-                    'error': 'Movie not found'
-                }), 404
+                abort(404)
 
             return jsonify({
                 'success': True,
-                'delete': movie_id
+                'deleted': movie_id
             }), 200
 
         except Exception:
-            return jsonify({
-                "success": False,
-                'error': 'Error while deleting the movie'
-            }), 500
+            abort(404)
 
     @app.route('/actors', methods=['GET'])
     @requires_auth('read:actors')
@@ -196,10 +187,7 @@ def create_app(test_config=None):
                 actor.gender = gender
                 actor.update()
             else:
-                return jsonify({
-                    "success": False,
-                    'error': 'Actor not found'
-                }), 404
+                abort(404)
 
             return jsonify({
                 'success': True,
@@ -221,17 +209,12 @@ def create_app(test_config=None):
 
             if actor:
                 actor.delete()
-            else:
                 return jsonify({
-                    "success": False,
-                    'error': 'Actor not found'
-                }), 404
-
-            return jsonify({
-                'success': True,
-                'delete': actor_id
-            }), 200
-
+                    'success': True,
+                    'delete': actor_id
+                }), 200
+            else:
+                abort(404)
         except Exception:
             return jsonify({
                 "success": False,
@@ -243,7 +226,7 @@ def create_app(test_config=None):
         response = jsonify(exception.error)
         response.status_code = exception.status_code
         return response
-    
+
     @app.errorhandler(400)
     def not_allowed(error):
         return jsonify({
@@ -251,6 +234,14 @@ def create_app(test_config=None):
             "error": 400,
             "message": "Bad request"
         }), 400
+
+    @app.errorhandler(404)
+    def not_allowed(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "Resource not found"
+        }), 404
 
     @app.route('/coolkids')
     def be_cool():
