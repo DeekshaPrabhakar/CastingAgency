@@ -39,7 +39,7 @@ def create_app(test_config=None):
                 'movies': movies,
                 'total_movies': len(movies)
             })
-        except:
+        except Exception:
             print(sys.exc_info())
             abort(404)
 
@@ -66,7 +66,7 @@ def create_app(test_config=None):
                 'total_movies': len(movies)
             })
 
-        except:
+        except Exception:
             print(sys.exc_info())
             abort(405)
 
@@ -133,7 +133,7 @@ def create_app(test_config=None):
                 'actors': actors,
                 'total_actors': len(actors)
             })
-        except:
+        except Exception:
             print(sys.exc_info())
             abort(404)
 
@@ -161,7 +161,7 @@ def create_app(test_config=None):
                 'total_actors': len(actors)
             })
 
-        except:
+        except Exception:
             print(sys.exc_info())
             abort(405)
 
@@ -211,15 +211,12 @@ def create_app(test_config=None):
                 actor.delete()
                 return jsonify({
                     'success': True,
-                    'delete': actor_id
+                    'deleted': actor_id
                 }), 200
             else:
                 abort(404)
         except Exception:
-            return jsonify({
-                "success": False,
-                'error': 'Error while deleting the actor'
-            }), 500
+            abort(404)
 
     @app.errorhandler(AuthError)
     def auth_error(exception):

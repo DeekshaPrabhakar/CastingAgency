@@ -293,8 +293,61 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['deleted'], movie_id)
         self.assertEqual(movie, None)
 
+    def test_movie_delete_not_allowed(self):
+        res = self.client().delete('/movies/1',
+                                   headers=self.assistantHeader
+                                   )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['code'], 'invalid_access_request')
+        self.assertEqual(data['description'],
+                         'You dont have permissions to access this resource')
+
     def test_delete_movie_not_exist(self):
         res = self.client().delete('/movies/1000',
+                                   headers=self.producerHeader
+                                   )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['error'], 404)
+        self.assertEqual(data['message'],
+                         'Resource not found')
+
+    def test_delete_actor(self):
+        actor = Actor(
+            self.update_actor_valid.get('name'),
+            self.update_actor_valid.get('age'),
+            self.update_actor_valid.get('gender')
+        )
+        actor.insert()
+        actor_id = actor.id
+        res = self.client().delete('/actors/' + str(actor_id),
+                                   headers=self.producerHeader
+                                   )
+        data = json.loads(res.data)
+
+        actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], actor_id)
+        self.assertEqual(actor, None)
+
+    def test_actor_delete_not_allowed(self):
+        res = self.client().delete('/actors/1',
+                                   headers=self.assistantHeader
+                                   )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['code'], 'invalid_access_request')
+        self.assertEqual(data['description'],
+                         'You dont have permissions to access this resource')
+
+    def test_actor_not_exist(self):
+        res = self.client().delete('/actors/1000',
                                    headers=self.producerHeader
                                    )
         data = json.loads(res.data)
