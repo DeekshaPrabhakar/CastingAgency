@@ -78,6 +78,9 @@ def create_app(test_config=None):
         title = body.get('title', None)
         release_date = body.get('release_date', None)
 
+        if title is None:
+            abort(400)
+
         try:
             movie = Movie.query.filter(
                 Movie.id == movie_id).one_or_none()
@@ -179,6 +182,9 @@ def create_app(test_config=None):
         name = body.get('name', None)
         age = body.get('age', None)
         gender = body.get('gender', None)
+
+        if name is None or age is None or gender is None:
+            abort(400)
 
         try:
             actor = Actor.query.filter(

@@ -21,9 +21,19 @@ class CastingAgencyTestCase(unittest.TestCase):
         setup_db(self.app, self.database_path)
 
         self.new_actor = {
+            'name': 'Tom Hankss',
+            'age': 63,
+            'gender': 'Male'
+        }
+
+        self.update_actor_valid = {
             'name': 'Tom Hanks',
             'age': 63,
             'gender': 'Male'
+        }
+
+        self.update_actor_invalid = {
+            "title": "Tom Hanks"
         }
 
         self.invalid_actor = {
@@ -158,6 +168,34 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['message'],
                          'Bad request')
 
+    def test_update_actor(self):
+        res = self.client().patch('/actors/1',
+                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.update_actor_valid)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['actors'][0].get('name'), self.update_actor_valid.get('name'))
+
+    def test_actor_update_not_allowed(self):
+        res = self.client().patch('/actors/1',
+                                 headers={'Authorization': "Bearer {}".format(self.assistantToken)}, json=self.update_actor_valid)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['code'], 'invalid_access_request')
+        self.assertEqual(data['description'],
+                         'You dont have permissions to access this resource')
+
+    def test_invalid_actor_update(self):
+        res = self.client().patch('/actors/1',
+                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.update_actor_invalid)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['error'], 400)
+        self.assertEqual(data['message'],
+                         'Bad request')
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
