@@ -98,7 +98,8 @@ To start and run the local development server,
 
 3. Set up database using psql on command line:
   ```
-  createdb CastingAgency
+  dropdb casting
+  createdb casting
   ```
 
 4. Run the development server:
