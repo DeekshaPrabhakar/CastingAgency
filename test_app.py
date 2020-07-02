@@ -5,6 +5,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from app import create_app
 from models import setup_db, Actor, Movie
+from datetime import datetime
 
 
 class CastingAgencyTestCase(unittest.TestCase):
@@ -31,7 +32,11 @@ class CastingAgencyTestCase(unittest.TestCase):
 
         self.new_movie = {
             'title': 'The Da Vinci Code',
-            'release_date': 'May 19, 2006'
+            'release_date': datetime.strptime('2006-5-5', '%Y-%m-%d')
+        }
+
+        self.invalid_movie = {
+            'name': 'Tom Hanks'
         }
 
         self.assistantToken = os.environ['ASSISTANT']
@@ -111,10 +116,41 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['code'], 'invalid_access_request')
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
-    
+
     def test_invalid_actor_creation(self):
         res = self.client().post('/actors',
                                  headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.invalid_actor)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['error'], 400)
+        self.assertEqual(data['message'],
+                         'Bad request')
+
+    def test_create_movie(self):
+        res = self.client().post('/movies',
+                                 headers={'Authorization': "Bearer {}".format(self.producerToken)}, json=self.new_movie)
+        data = json.loads(res.data)
+
+        movies = [movie.format() for movie in Movie.query.all()]
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['movies'], movies)
+        self.assertEqual(data['total_movies'], len(movies))
+
+    def test_movie_creation_not_allowed(self):
+        res = self.client().post('/movies',
+                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.new_movie)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['code'], 'invalid_access_request')
+        self.assertEqual(data['description'],
+                         'You dont have permissions to access this resource')
+
+    def test_invalid_movie_creation(self):
+        res = self.client().post('/movies',
+                                 headers={'Authorization': "Bearer {}".format(self.producerToken)}, json=self.invalid_movie)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)

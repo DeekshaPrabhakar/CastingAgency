@@ -51,6 +51,9 @@ def create_app(test_config=None):
         title = body.get('title', None)
         release_date = body.get('release_date', None)
 
+        if title is None:
+            abort(400)
+
         try:
             movie = Movie(title=title, release_date=release_date)
             movie.insert()
