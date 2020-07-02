@@ -97,7 +97,7 @@ def create_app(test_config=None):
 
             return jsonify({
                 'success': True,
-                'actors': [movie.format()]
+                'movies': [movie.format()]
             }), 200
 
         except Exception:

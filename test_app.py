@@ -32,10 +32,6 @@ class CastingAgencyTestCase(unittest.TestCase):
             'gender': 'Male'
         }
 
-        self.update_actor_invalid = {
-            "title": "Tom Hanks"
-        }
-
         self.invalid_actor = {
             "title": "Tom Hanks"
         }
@@ -45,6 +41,11 @@ class CastingAgencyTestCase(unittest.TestCase):
             'release_date': datetime.strptime('2006-5-5', '%Y-%m-%d')
         }
 
+        self.update_movie_valid = {
+            'title': 'The Da Vinci Code',
+            'release_date': datetime.strptime('2003-3-18', '%Y-%m-%d')
+        }
+
         self.invalid_movie = {
             'name': 'Tom Hanks'
         }
@@ -52,6 +53,12 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assistantToken = os.environ['ASSISTANT']
         self.directorToken = os.environ['DIRECTOR']
         self.producerToken = os.environ['PRODUCER']
+        self.assistantHeader = {
+            'Authorization': "Bearer {}".format(self.assistantToken)}
+        self.directorHeader = {
+            'Authorization': "Bearer {}".format(self.directorToken)}
+        self.producerHeader = {
+            'Authorization': "Bearer {}".format(self.producerToken)}
 
     # binds the app to the current context
         with self.app.app_context():
@@ -66,7 +73,7 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_get_actors(self):
         res = self.client().get(
-            '/actors', headers={'Authorization': "Bearer {}".format(self.assistantToken)})
+            '/actors', headers=self.assistantHeader)
         data = json.loads(res.data)
 
         actors = [actor.format() for actor in Actor.query.all()]
@@ -87,7 +94,7 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_get_movies(self):
         res = self.client().get(
-            '/movies', headers={'Authorization': "Bearer {}".format(self.assistantToken)})
+            '/movies', headers=self.assistantHeader)
         data = json.loads(res.data)
 
         movies = [movie.format() for movie in Movie.query.all()]
@@ -108,7 +115,9 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_create_actor(self):
         res = self.client().post('/actors',
-                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.new_actor)
+                                 headers=self.directorHeader,
+                                 json=self.new_actor
+                                 )
         data = json.loads(res.data)
 
         actors = [actor.format() for actor in Actor.query.all()]
@@ -119,7 +128,9 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_actor_creation_not_allowed(self):
         res = self.client().post('/actors',
-                                 headers={'Authorization': "Bearer {}".format(self.assistantToken)}, json=self.new_actor)
+                                 headers=self.assistantHeader,
+                                 json=self.new_actor
+                                 )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 401)
@@ -129,7 +140,9 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_invalid_actor_creation(self):
         res = self.client().post('/actors',
-                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.invalid_actor)
+                                 headers=self.directorHeader,
+                                 json=self.invalid_actor
+                                 )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
@@ -139,7 +152,9 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_create_movie(self):
         res = self.client().post('/movies',
-                                 headers={'Authorization': "Bearer {}".format(self.producerToken)}, json=self.new_movie)
+                                 headers=self.producerHeader,
+                                 json=self.new_movie
+                                 )
         data = json.loads(res.data)
 
         movies = [movie.format() for movie in Movie.query.all()]
@@ -150,7 +165,9 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_movie_creation_not_allowed(self):
         res = self.client().post('/movies',
-                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.new_movie)
+                                 headers=self.directorHeader,
+                                 json=self.new_movie
+                                 )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 401)
@@ -160,7 +177,9 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_invalid_movie_creation(self):
         res = self.client().post('/movies',
-                                 headers={'Authorization': "Bearer {}".format(self.producerToken)}, json=self.invalid_movie)
+                                 headers=self.producerHeader,
+                                 json=self.invalid_movie
+                                 )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
@@ -170,16 +189,21 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_update_actor(self):
         res = self.client().patch('/actors/1',
-                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.update_actor_valid)
+                                  headers=self.directorHeader,
+                                  json=self.update_actor_valid
+                                  )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['actors'][0].get('name'), self.update_actor_valid.get('name'))
+        self.assertEqual(data['actors'][0].get('name'),
+                         self.update_actor_valid.get('name'))
 
     def test_actor_update_not_allowed(self):
         res = self.client().patch('/actors/1',
-                                 headers={'Authorization': "Bearer {}".format(self.assistantToken)}, json=self.update_actor_valid)
+                                  headers=self.assistantHeader,
+                                  json=self.update_actor_valid
+                                  )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 401)
@@ -189,13 +213,52 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     def test_invalid_actor_update(self):
         res = self.client().patch('/actors/1',
-                                 headers={'Authorization': "Bearer {}".format(self.directorToken)}, json=self.update_actor_invalid)
+                                  headers=self.directorHeader,
+                                  json=self.invalid_actor
+                                  )
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['error'], 400)
         self.assertEqual(data['message'],
                          'Bad request')
+
+    def test_update_movie(self):
+        res = self.client().patch('/movies/1',
+                                  headers=self.producerHeader,
+                                  json=self.update_movie_valid
+                                  )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['movies'][0].get('title'),
+                         self.update_movie_valid.get('title'))
+
+    def test_movie_update_not_allowed(self):
+        res = self.client().patch('/movies/1',
+                                  headers=self.assistantHeader,
+                                  json=self.update_movie_valid
+                                  )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['code'], 'invalid_access_request')
+        self.assertEqual(data['description'],
+                         'You dont have permissions to access this resource')
+
+    def test_invalid_movie_update(self):
+        res = self.client().patch('/movies/1',
+                                  headers=self.producerHeader,
+                                  json=self.invalid_movie
+                                  )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['error'], 400)
+        self.assertEqual(data['message'],
+                         'Bad request')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
