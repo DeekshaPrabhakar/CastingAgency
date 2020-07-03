@@ -40,7 +40,7 @@ ALGORITHMS = ['RS256']
 API_AUDIENCE = 'https://github.com/DeekshaPrabhakar/CastingAgency'
 ```
 
-`The tokens may expire, so please use the login credentials below to generate a new JWT token`
+`The tokens will expire on July 12th`
 
 ### Assistant account
 ```
@@ -110,6 +110,9 @@ To start and run the local development server,
   ```
 
 4. Navigate to Home page [http://localhost:5000](http://localhost:5000)
+
+## Live Server URL
+> `https://acastingagency.herokuapp.com/`
 
 ## API Reference
 
@@ -194,13 +197,13 @@ The API will return three error types when requests fail:
 #### POST /actors
 - General:
     - Creates a new actor using the submitted name, age, gender
-- `curl http://127.0.0.1:5000/movies -X POST -H "Content-Type: application/json" -d '{"name": "Will Smith", "age":"51", "gender":"Male"}'`
+- `curl http://127.0.0.1:5000/actors -X POST -H "Content-Type: application/json" -d '{"name": "Will Smithe", "age":"51", "gender":"Male"}'`
 ```
 {
     "actors": [
         {
             "id": 1,
-            "name": "Will Smith",
+            "name": "Will Smithe",
             "age": 51,
             "gender": "Male"
         }
@@ -212,7 +215,10 @@ The API will return three error types when requests fail:
 ```
 
 
-#### PATCH
+#### PATCH/actors/{actor_id}
+- General:
+    - Updates an existing actor using the submitted name, age, gender
+- `curl http://127.0.0.1:5000/actors/1 -X POST -H "Content-Type: application/json" -d '{"name": "Will Smith", "age":"51", "gender":"Male"}'`
 
 ```
 {
@@ -228,7 +234,10 @@ The API will return three error types when requests fail:
 }
 ```
 
-#### PATCH
+#### PATCH/movies/{movie_id}
+- General:
+    - Updates and existing movie using the submitted title, release_date. 
+- `curl http://127.0.0.1:5000/movies/1 -X POST -H "Content-Type: application/json" -d '{"title": "The Da Vinci Code", "release_date":"2006-05-16"}'`
 
 ```
 {
@@ -270,8 +279,9 @@ The API will return three error types when requests fail:
 ## Testing
 To run the tests, run
 ```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
+dropdb casting_agency_test
+createdb casting_agency_test
+python test_app.py
 ```
+
+You can also test using the postman collection available in the project
