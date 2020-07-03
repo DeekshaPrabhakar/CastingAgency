@@ -73,6 +73,21 @@ password: apple123*
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im5aaUxsbEpDVk1sSjVpLWM2TGtBQSJ9.eyJpc3MiOiJodHRwczovL2RlZWRldi5hdXRoMC5jb20vIiwic3ViIjoiTThPNlNLd0ZGdVhEV3RIYU9ncDBHVkZqclhBRjMyelhAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZ2l0aHViLmNvbS9EZWVrc2hhUHJhYmhha2FyL0Nhc3RpbmdBZ2VuY3kiLCJpYXQiOjE1OTM3MzMxNDMsImV4cCI6MTU5NDU5NzE0MywiYXpwIjoiTThPNlNLd0ZGdVhEV3RIYU9ncDBHVkZqclhBRjMyelgiLCJzY29wZSI6InJlYWQ6YWN0b3JzIGNyZWF0ZTphY3RvciBkZWxldGU6YWN0b3IgdXBkYXRlOmFjdG9yIGNyZWF0ZTptb3ZpZSBkZWxldGU6bW92aWUgdXBkYXRlOm1vdmllIHJlYWQ6bW92aWVzIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOlsicmVhZDphY3RvcnMiLCJjcmVhdGU6YWN0b3IiLCJkZWxldGU6YWN0b3IiLCJ1cGRhdGU6YWN0b3IiLCJjcmVhdGU6bW92aWUiLCJkZWxldGU6bW92aWUiLCJ1cGRhdGU6bW92aWUiLCJyZWFkOm1vdmllcyJdfQ.rSYO06LliGk42bR00TsQQSkCKH9--Qdm_pfTYJv-F2kSiTnVvWbc8MJWysJKH4_iJPSY61xhdVcx3BOM_tI2ASlGxRbZWMwps2Iqe74ORZV4xCVNwijaYO1lzDsBRdDBpQzwmjrdE6tfhLTM4o2ROsjHBcMbrAKe7r_8LAXqq7uTfCwLownHNd8H4Q2PLQZw0OO4YOSrEQlis9NsYymO3sYtWtDBF22YRuITA60svRnQTxlh6ygWfxk7Aik2pQZnfh15wsqKFLbB7Nd9gSt5KmtxGB29Iv5rQn7_qAdzivYLoJR6aKgdHhemKXN50c6pJAMWVwO_E4wwU-tFMiuR7g
 ```
 
+### Permissions
+* `create:actor`: Create actor
+* `read:actors`: View actors
+* `update:actor`: Update actor
+* `delete:actor`: Delete actor
+* `create:movie`: Create movie
+* `read:movies`: View movies
+* `update:movie`: Update movie
+* `delete:movie`: Delete movie
+
+### Roles
+* Casting Assistant: Can view actors and movies
+* Casting Director: Can	create, read, update, delete actors, read and update movies
+* Executive Producer: Can create, read, update, delete actors and movies
+
 ## Development Setup
 
 First, [install Flask](http://flask.pocoo.org/docs/1.0/installation/#install-flask) if you haven't already.
@@ -116,6 +131,8 @@ To start and run the local development server,
 
 ## API Reference
 
+> You can test the API endpoints using the live postman collection available in the project
+
 ### Getting Started
 - Base URL: At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`, which is set as a proxy in the frontend configuration. 
 - Authentication: This version of the application requires authentication or API keys. 
@@ -139,7 +156,6 @@ The API will return three error types when requests fail:
 #### GET /movies
 - General:
     - Returns a list of movies
-- Sample: `curl http://127.0.0.1:5000/movies`
 
 ``` 
 {
@@ -158,7 +174,6 @@ The API will return three error types when requests fail:
 #### GET /actors
 - General:
     - Returns a list of actors
-- Sample: `curl http://127.0.0.1:5000/actors`
 
 ``` 
 {
@@ -178,7 +193,6 @@ The API will return three error types when requests fail:
 #### POST /movies
 - General:
     - Creates a new movie using the submitted title, release_date. 
-- `curl http://127.0.0.1:5000/movies -X POST -H "Content-Type: application/json" -d '{"title": "The Da Vinci Code", "release_date":"2006-05-19"}'`
 ```
 {
     "created": 1,
@@ -197,7 +211,6 @@ The API will return three error types when requests fail:
 #### POST /actors
 - General:
     - Creates a new actor using the submitted name, age, gender
-- `curl http://127.0.0.1:5000/actors -X POST -H "Content-Type: application/json" -d '{"name": "Will Smithe", "age":"51", "gender":"Male"}'`
 ```
 {
     "actors": [
@@ -218,7 +231,6 @@ The API will return three error types when requests fail:
 #### PATCH/actors/{actor_id}
 - General:
     - Updates an existing actor using the submitted name, age, gender
-- `curl http://127.0.0.1:5000/actors/1 -X POST -H "Content-Type: application/json" -d '{"name": "Will Smith", "age":"51", "gender":"Male"}'`
 
 ```
 {
@@ -237,7 +249,6 @@ The API will return three error types when requests fail:
 #### PATCH/movies/{movie_id}
 - General:
     - Updates and existing movie using the submitted title, release_date. 
-- `curl http://127.0.0.1:5000/movies/1 -X POST -H "Content-Type: application/json" -d '{"title": "The Da Vinci Code", "release_date":"2006-05-16"}'`
 
 ```
 {
@@ -255,7 +266,6 @@ The API will return three error types when requests fail:
 #### DELETE /actors/{actor_id}
 - General:
     - Deletes the actor of the given ID if it exists. Returns the id of the deleted actor id, success value
-- `curl -X DELETE http://127.0.0.1:5000/actors/1`
 ```
 {
     "deleted": 1,
@@ -266,7 +276,6 @@ The API will return three error types when requests fail:
 #### DELETE /movies/{movie_id}
 - General:
     - Deletes the movie of the given ID if it exists. Returns the id of the deleted movie id, success value
-- `curl -X DELETE http://127.0.0.1:5000/movies/1`
 ```
 {
     "deleted": 1,
@@ -284,4 +293,3 @@ createdb casting_agency_test
 python test_app.py
 ```
 
-You can also test using the postman collection available in the project

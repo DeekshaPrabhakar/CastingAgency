@@ -23,10 +23,7 @@ def create_app(test_config=None):
 
     @app.route('/')
     def get_greeting():
-        excited = os.environ['EXCITED']
-        greeting = "Hello"
-        if excited == 'true':
-            greeting = greeting + "!!!!!"
+        greeting = "Hello!!"
         return greeting
 
     @app.route('/movies', methods=['GET'])
