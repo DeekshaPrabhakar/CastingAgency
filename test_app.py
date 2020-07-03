@@ -89,7 +89,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['actors'], actors)
         self.assertEqual(data['total_actors'], len(actors))
 
-    def test_get_actors_without_token(self):
+    def test_error_401_read_actors(self):
         res = self.client().get('/actors')
         data = json.loads(res.data)
 
@@ -110,7 +110,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['movies'], movies)
         self.assertEqual(data['total_movies'], len(movies))
 
-    def test_get_movies_without_token(self):
+    def test_error_401_read_movies(self):
         res = self.client().get('/movies')
         data = json.loads(res.data)
 
@@ -132,7 +132,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['actors'], actors)
         self.assertEqual(data['total_actors'], len(actors))
 
-    def test_actor_creation_not_allowed(self):
+    def test_error_401_create_actor(self):
         res = self.client().post('/actors',
                                  headers=self.assistantHeader,
                                  json=self.new_actor
@@ -144,7 +144,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
 
-    def test_invalid_actor_creation(self):
+    def test_error_400_create_actor(self):
         res = self.client().post('/actors',
                                  headers=self.directorHeader,
                                  json=self.invalid_actor
@@ -169,7 +169,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['movies'], movies)
         self.assertEqual(data['total_movies'], len(movies))
 
-    def test_movie_creation_not_allowed(self):
+    def test_error_401_create_movie(self):
         res = self.client().post('/movies',
                                  headers=self.directorHeader,
                                  json=self.new_movie
@@ -181,7 +181,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
 
-    def test_invalid_movie_creation(self):
+    def test_error_400_create_movie(self):
         res = self.client().post('/movies',
                                  headers=self.producerHeader,
                                  json=self.invalid_movie
@@ -212,7 +212,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['actors'][0].get('name'),
                          self.update_actor_valid.get('name'))
 
-    def test_actor_update_not_allowed(self):
+    def test_error_401_update_actor(self):
         res = self.client().patch('/actors/1',
                                   headers=self.assistantHeader,
                                   json=self.update_actor_valid
@@ -224,7 +224,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
 
-    def test_invalid_actor_update(self):
+    def test_error_400_update_actor(self):
         res = self.client().patch('/actors/1',
                                   headers=self.directorHeader,
                                   json=self.invalid_actor
@@ -252,7 +252,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['movies'][0].get('title'),
                          self.update_movie_valid.get('title'))
 
-    def test_movie_update_not_allowed(self):
+    def test_error_401_update_movie(self):
         res = self.client().patch('/movies/1',
                                   headers=self.assistantHeader,
                                   json=self.update_movie_valid
@@ -264,7 +264,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
 
-    def test_invalid_movie_update(self):
+    def test_error_400_update_movie(self):
         res = self.client().patch('/movies/1',
                                   headers=self.producerHeader,
                                   json=self.invalid_movie
@@ -293,7 +293,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['deleted'], movie_id)
         self.assertEqual(movie, None)
 
-    def test_movie_delete_not_allowed(self):
+    def test_error_401_delete_movie(self):
         res = self.client().delete('/movies/1',
                                    headers=self.assistantHeader
                                    )
@@ -304,7 +304,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
 
-    def test_delete_movie_not_exist(self):
+    def test_error_404_delete_movie(self):
         res = self.client().delete('/movies/1000',
                                    headers=self.producerHeader
                                    )
@@ -335,7 +335,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['deleted'], actor_id)
         self.assertEqual(actor, None)
 
-    def test_actor_delete_not_allowed(self):
+    def test_error_401_delete_actor(self):
         res = self.client().delete('/actors/1',
                                    headers=self.assistantHeader
                                    )
@@ -346,7 +346,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['description'],
                          'You dont have permissions to access this resource')
 
-    def test_actor_not_exist(self):
+    def test_error_404_delete_actor(self):
         res = self.client().delete('/actors/1000',
                                    headers=self.producerHeader
                                    )

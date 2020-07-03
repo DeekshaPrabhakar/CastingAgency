@@ -1,37 +1,42 @@
-# Casting Agency
+# Casting Agency Backend
 
 ## Introduction
 
 This application models a company that is responsible for creating movies and managing and assigning actors to those movies and streamline the process.
 
-## Specifications
+## Motivation
+To make use of knowledge acquired from the nanodegree program. The next iteration can be to include a front end.
 
-### Models:
+## DATA MODELING:
+#### models.py
+The schema for the database and helper methods to simplify API behavior are in models.py:
+- There are two tables created: Movie and Actor
+- Movie with attributes title and release date
+- Actor with attributes name, age and gender
+- The Movie and the Actor tables is used by the 3 roles to add/edit movies/actors and to update or delete them.
+- Each table has an insert, update, delete, and format helper functions.
 
-* Movies with attributes title and release date
-* Actors with attributes name, age and gender
+## API ARCHITECTURE
+### Endpoint Library
 
-### Endpoints:
-* GET /actors and /movies
-* DELETE /actors/ and /movies/
-* POST /actors and /movies and
-* PATCH /actors/ and /movies/
+@app.errorhandler decorators were used to format error responses as JSON objects. Custom @requires_auth decorator were used for Authorization based on roles of the user. 
+Three roles are assigned to this API: 
+* Casting Assistant: Can view actors and movies
+* Casting Director: Can	create, read, update, delete actors, read and update movies
+* Executive Producer: Can create, read, update, delete actors and movies
 
-### Roles:
-* Casting Assistant: 
-    - Can view actors and movies
-* Casting Director
-    - All permissions a Casting Assistant has and…
-    - Add or delete an actor from the database
-    - Modify actors or movies
-* Executive Producer
-    - All permissions a Casting Director has and…
-    - Add or delete a movie from the database
+A token needs to be passed to each endpoint and the plan is to incorporate a front end for user to login in the next iteration.
 
-### Tests:
-* One test for success behavior of each endpoint
-* One test for error behavior of each endpoint
-* At least two tests of RBAC for each role
+### Permissions
+* `create:actor`: Create actor
+* `read:actors`: View actors
+* `update:actor`: Update actor
+* `delete:actor`: Delete actor
+* `create:movie`: Create movie
+* `read:movies`: View movies
+* `update:movie`: Update movie
+* `delete:movie`: Delete movie
+
 
 ## Auth0 account
 ```python
@@ -73,21 +78,6 @@ password: apple123*
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im5aaUxsbEpDVk1sSjVpLWM2TGtBQSJ9.eyJpc3MiOiJodHRwczovL2RlZWRldi5hdXRoMC5jb20vIiwic3ViIjoiTThPNlNLd0ZGdVhEV3RIYU9ncDBHVkZqclhBRjMyelhAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZ2l0aHViLmNvbS9EZWVrc2hhUHJhYmhha2FyL0Nhc3RpbmdBZ2VuY3kiLCJpYXQiOjE1OTM3MzMxNDMsImV4cCI6MTU5NDU5NzE0MywiYXpwIjoiTThPNlNLd0ZGdVhEV3RIYU9ncDBHVkZqclhBRjMyelgiLCJzY29wZSI6InJlYWQ6YWN0b3JzIGNyZWF0ZTphY3RvciBkZWxldGU6YWN0b3IgdXBkYXRlOmFjdG9yIGNyZWF0ZTptb3ZpZSBkZWxldGU6bW92aWUgdXBkYXRlOm1vdmllIHJlYWQ6bW92aWVzIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOlsicmVhZDphY3RvcnMiLCJjcmVhdGU6YWN0b3IiLCJkZWxldGU6YWN0b3IiLCJ1cGRhdGU6YWN0b3IiLCJjcmVhdGU6bW92aWUiLCJkZWxldGU6bW92aWUiLCJ1cGRhdGU6bW92aWUiLCJyZWFkOm1vdmllcyJdfQ.rSYO06LliGk42bR00TsQQSkCKH9--Qdm_pfTYJv-F2kSiTnVvWbc8MJWysJKH4_iJPSY61xhdVcx3BOM_tI2ASlGxRbZWMwps2Iqe74ORZV4xCVNwijaYO1lzDsBRdDBpQzwmjrdE6tfhLTM4o2ROsjHBcMbrAKe7r_8LAXqq7uTfCwLownHNd8H4Q2PLQZw0OO4YOSrEQlis9NsYymO3sYtWtDBF22YRuITA60svRnQTxlh6ygWfxk7Aik2pQZnfh15wsqKFLbB7Nd9gSt5KmtxGB29Iv5rQn7_qAdzivYLoJR6aKgdHhemKXN50c6pJAMWVwO_E4wwU-tFMiuR7g
 ```
 
-### Permissions
-* `create:actor`: Create actor
-* `read:actors`: View actors
-* `update:actor`: Update actor
-* `delete:actor`: Delete actor
-* `create:movie`: Create movie
-* `read:movies`: View movies
-* `update:movie`: Update movie
-* `delete:movie`: Delete movie
-
-### Roles
-* Casting Assistant: Can view actors and movies
-* Casting Director: Can	create, read, update, delete actors, read and update movies
-* Executive Producer: Can create, read, update, delete actors and movies
-
 ## Development Setup
 
 First, [install Flask](http://flask.pocoo.org/docs/1.0/installation/#install-flask) if you haven't already.
@@ -108,7 +98,7 @@ To start and run the local development server,
 
 2. Install the dependencies:
   ```
-  $ pip install -r requirements.txt
+  $ pip3 install -r requirements.txt
   ```
 
 3. Set up database using psql on command line:
@@ -123,8 +113,12 @@ To start and run the local development server,
   $ export FLASK_ENV=development # enables debug mode
   $ python3 app.py
   ```
+On Linux : export
+> `export FLASK_APP=app.py;`
+On Windows : set
+> `set FLASK_APP=app.py;`
 
-4. Navigate to Home page [http://localhost:5000](http://localhost:5000)
+5. Navigate to Home page [http://localhost:5000](http://localhost:5000)
 
 ## Live Server URL
 > `https://acastingagency.herokuapp.com/`
@@ -147,9 +141,10 @@ Errors are returned as JSON objects in the following format:
 }
 ```
 The API will return three error types when requests fail:
+- 400: Bad Request
+- 401: Unauthorized
 - 404: Resource Not Found
 - 405: Method Not Allowed
-- 422: Not Processable 
 - 500: Server Error
 
 ### Endpoints 
@@ -290,6 +285,6 @@ To run the tests, run
 ```
 dropdb casting_agency_test
 createdb casting_agency_test
-python test_app.py
+python3 test_app.py
 ```
 
