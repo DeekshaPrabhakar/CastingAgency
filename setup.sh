@@ -1,5 +1,6 @@
 
 export DATABASE_URL='postgres://postgres@localhost:5432/casting'
+export DATABASE_URL_TEST='postgres://postgres@localhost:5432/casting_agency_test'
 export AUTH0_DOMAIN='deedev.auth0.com'
 export ALGORITHMS=['RS256']
 export API_AUDIENCE='https://github.com/DeekshaPrabhakar/CastingAgency'
